@@ -39,7 +39,7 @@ const DEFAULT_PRODUCTS = {
     { id: "s2", name: "法式千層蛋糕", price: 120 },
   ],
 };
-const DEFAULT_CONFIG = { comboDiscount: 30, shopName: "蕎淶清飲" };
+const DEFAULT_CONFIG = { comboDiscount: 10, shopName: "蕎淶清飲" };
 
 const money = (n) => `$${Math.round(n).toLocaleString()}`;
 const todayStr = () => new Date().toISOString().slice(0, 10);
@@ -225,14 +225,15 @@ export default function FrontOfHousePOS() {
       </div>
 
       {view === "order" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 430px", minHeight: "calc(100vh - 65px)" }}>
-          <div style={{ padding: 22 }}>
-            <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
+        <div style={{ display: "flex", flexDirection: "column", minHeight: "calc(100vh - 65px)" }}>
+          {/* product area — top, full width */}
+          <div style={{ flex: 1, padding: "18px 24px", overflowY: "auto" }}>
+            <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
               {CATS.map((c) => (
                 <button key={c} onClick={() => setCat(c)} style={{
-                  padding: "16px 30px", borderRadius: 12, cursor: "pointer",
+                  padding: "14px 32px", borderRadius: 12, cursor: "pointer",
                   border: `1px solid ${cat === c ? C.ink : C.line}`, background: cat === c ? C.ink : C.surface,
-                  color: cat === c ? "#fff" : C.muted, fontFamily: "Sora", fontWeight: 700, fontSize: 18,
+                  color: cat === c ? "#fff" : C.muted, fontFamily: "Sora", fontWeight: 700, fontSize: 19,
                 }}>{c}</button>
               ))}
             </div>
@@ -240,12 +241,12 @@ export default function FrontOfHousePOS() {
             {editMode && cat === "比薩" && (
               <div style={{ marginBottom: 16, padding: 12, borderRadius: 10, background: C.goldSoft, border: `1px dashed ${C.gold}`, display: "flex", alignItems: "center", gap: 10 }}>
                 <Tag size={14} color={C.gold} />
-                <span style={{ fontSize: 12.5, color: C.ink, fontWeight: 600 }}>比薩＋飲料套組折扣（每組折抵）</span>
+                <span style={{ fontSize: 13, color: C.ink, fontWeight: 600 }}>比薩＋飲料套組折扣（每組折抵）</span>
                 <input type="number" value={comboDiscount} onChange={(e) => updateConfig({ comboDiscount: parseFloat(e.target.value) || 0 })} style={{ ...smallInputStyle, width: 80 }} />
               </div>
             )}
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))", gap: 16 }}>
               {products[cat].map((p) => (
                 editMode ? (
                   <div key={p.id} style={{ padding: 14, borderRadius: 14, background: C.surface, border: `1px solid ${C.line}` }}>
@@ -257,9 +258,9 @@ export default function FrontOfHousePOS() {
                     </div>
                   </div>
                 ) : (
-                  <button key={p.id} onClick={() => addToCart(p, cat)} style={{ textAlign: "left", padding: 22, minHeight: 96, borderRadius: 16, background: C.surface, border: `1px solid ${C.line}`, color: C.ink, cursor: "pointer" }}>
-                    <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 19, marginBottom: 10, lineHeight: 1.3 }}>{p.name}</div>
-                    <div style={{ fontFamily: "IBM Plex Mono", color: C.gold, fontSize: 20, fontWeight: 700 }}>{money(p.price)}</div>
+                  <button key={p.id} onClick={() => addToCart(p, cat)} style={{ textAlign: "left", padding: 26, minHeight: 108, borderRadius: 18, background: C.surface, border: `1px solid ${C.line}`, color: C.ink, cursor: "pointer" }}>
+                    <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 22, marginBottom: 12, lineHeight: 1.3 }}>{p.name}</div>
+                    <div style={{ fontFamily: "IBM Plex Mono", color: C.gold, fontSize: 23, fontWeight: 700 }}>{money(p.price)}</div>
                   </button>
                 )
               ))}
@@ -271,49 +272,55 @@ export default function FrontOfHousePOS() {
             </div>
           </div>
 
-          <div style={{ borderLeft: `1px solid ${C.line}`, background: C.surface, display: "flex", flexDirection: "column" }}>
-            <div style={{ padding: "16px 18px 10px", display: "flex", alignItems: "center", gap: 8, borderBottom: `1px solid ${C.line}` }}>
-              <ShoppingCart size={18} color={C.gold} />
-              <span style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 17 }}>本次點單</span>
-              <span style={{ marginLeft: "auto", fontSize: 14, color: C.faint }}>{cart.reduce((s, i) => s + i.qty, 0)} 項</span>
-            </div>
-            <div style={{ flex: 1, overflowY: "auto", padding: "6px 18px", maxHeight: 260 }}>
-              {cart.length === 0 && <div style={{ color: C.faint, fontSize: 13, textAlign: "center", marginTop: 30 }}>尚未選擇商品</div>}
-              {cart.map((i) => (
-                <div key={i.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 0", borderBottom: `1px solid ${C.line}` }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 17, fontWeight: 600 }}>{i.name}</div>
-                    <div style={{ fontSize: 13.5, color: C.faint, fontFamily: "IBM Plex Mono" }}>{money(i.price)} × {i.qty}</div>
-                  </div>
-                  <button onClick={() => changeQty(i.id, -1)} style={iconBtnStyle}><Minus size={16} /></button>
-                  <span style={{ width: 24, textAlign: "center", fontFamily: "IBM Plex Mono", fontSize: 16, fontWeight: 600 }}>{i.qty}</span>
-                  <button onClick={() => changeQty(i.id, 1)} style={iconBtnStyle}><Plus size={16} /></button>
-                  <button onClick={() => removeItem(i.id)} style={{ ...iconBtnStyle, color: C.danger }}><Trash2 size={16} /></button>
-                </div>
-              ))}
-            </div>
-            <div style={{ padding: "12px 18px", borderTop: `1px solid ${C.line}` }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 9, background: comboPairs > 0 ? C.greenSoft : C.bg, marginBottom: 10 }}>
-                <Tag size={13} color={comboPairs > 0 ? C.green : C.faint} />
-                <span style={{ fontSize: 11.5, color: comboPairs > 0 ? C.green : C.faint, fontWeight: 600 }}>
-                  {comboPairs > 0 ? `已套用 ${comboPairs} 組比薩＋飲料折扣` : "比薩＋飲料套組折扣：尚未達成組合"}
-                </span>
+          {/* checkout bar — bottom, fixed, full width */}
+          <div style={{ borderTop: `1px solid ${C.line}`, background: C.surface, display: "flex", flexWrap: "wrap" }}>
+
+            <div style={{ width: 340, padding: "16px 22px", borderRight: `1px solid ${C.line}`, display: "flex", flexDirection: "column" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <ShoppingCart size={18} color={C.gold} />
+                <span style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 16 }}>本次點單</span>
+                <span style={{ marginLeft: "auto", fontSize: 13, color: C.faint }}>{cart.reduce((s, i) => s + i.qty, 0)} 項</span>
               </div>
-              <Row label="小計" value={money(subtotal)} muted />
-              {discount > 0 && <Row label="套組折扣" value={`− ${money(discount)}`} color={C.green} />}
-              <Row label="應收金額" value={money(total)} big />
-              <div style={{ display: "flex", gap: 8, margin: "12px 0 8px" }}>
-                <input value={noChange ? String(total) : cash} onChange={(e) => { setCash(e.target.value.replace(/[^0-9]/g, "")); setNoChange(false); }} placeholder="客收現金" style={{ ...smallInputStyle, flex: 1, padding: "14px 16px", fontSize: 19, fontFamily: "IBM Plex Mono" }} />
-                <button onClick={() => setNoChange((v) => !v)} style={{ padding: "0 18px", borderRadius: 10, border: `1px solid ${noChange ? C.green : C.line}`, background: noChange ? C.greenSoft : "transparent", color: noChange ? C.green : C.muted, fontWeight: 700, fontSize: 15, cursor: "pointer", whiteSpace: "nowrap" }}>不找零</button>
+              <div style={{ maxHeight: 96, overflowY: "auto", marginBottom: 8 }}>
+                {cart.length === 0 && <div style={{ color: C.faint, fontSize: 14, padding: "10px 0" }}>尚未選擇商品</div>}
+                {cart.map((i) => (
+                  <div key={i.id} style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 0" }}>
+                    <span style={{ flex: 1, fontSize: 15, fontWeight: 600 }}>{i.name} × {i.qty}</span>
+                    <button onClick={() => changeQty(i.id, -1)} style={{ ...iconBtnStyle, width: 26, height: 26 }}><Minus size={13} /></button>
+                    <button onClick={() => changeQty(i.id, 1)} style={{ ...iconBtnStyle, width: 26, height: 26 }}><Plus size={13} /></button>
+                    <button onClick={() => removeItem(i.id)} style={{ ...iconBtnStyle, width: 26, height: 26, color: C.danger }}><Trash2 size={13} /></button>
+                  </div>
+                ))}
+              </div>
+              {comboPairs > 0 && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: C.green, fontWeight: 600, marginBottom: 6 }}>
+                  <Tag size={12} /> 已套用 {comboPairs} 組套組折扣
+                </div>
+              )}
+              <div style={{ marginTop: "auto", borderTop: `1px solid ${C.line}`, paddingTop: 8 }}>
+                {discount > 0 && <Row label="套組折扣" value={`− ${money(discount)}`} color={C.green} />}
+                <Row label="應收金額" value={money(total)} big />
+              </div>
+            </div>
+
+            <div style={{ flex: 1, minWidth: 280, padding: "16px 22px", display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ display: "flex", gap: 10 }}>
+                <input value={noChange ? String(total) : cash} onChange={(e) => { setCash(e.target.value.replace(/[^0-9]/g, "")); setNoChange(false); }} placeholder="客收現金" style={{ ...smallInputStyle, flex: 1, padding: "14px 16px", fontSize: 22, fontFamily: "IBM Plex Mono" }} />
+                <button onClick={() => setNoChange((v) => !v)} style={{ padding: "0 20px", borderRadius: 10, border: `1px solid ${noChange ? C.green : C.line}`, background: noChange ? C.greenSoft : "transparent", color: noChange ? C.green : C.muted, fontWeight: 700, fontSize: 16, cursor: "pointer", whiteSpace: "nowrap" }}>不找零</button>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 15, color: C.faint }}>
+                  找零 <span style={{ fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: 18, color: C.gold }}>{cash === "" && !noChange ? "—" : money(change)}</span>
+                </div>
               </div>
               <Numpad onDigit={(d) => setCash((c) => (noChange ? "" : c) + d)} onClear={() => { setCash(""); setNoChange(false); }} onBackspace={() => setCash((c) => c.slice(0, -1))} disabled={noChange} />
-              <Row label="找零" value={cash === "" && !noChange ? "—" : money(change)} color={C.gold} style={{ marginTop: 10 }} />
+            </div>
+
+            <div style={{ width: 220, padding: 16, display: "flex" }}>
               <button disabled={cart.length === 0 || (!noChange && cashNum < total)} onClick={checkout} style={{
-                width: "100%", marginTop: 14, padding: "18px 0", borderRadius: 14, border: "none",
+                flex: 1, borderRadius: 16, border: "none",
                 background: (cart.length && (noChange || cashNum >= total)) ? C.ink : C.line,
                 color: (cart.length && (noChange || cashNum >= total)) ? "#fff" : C.faint,
-                fontFamily: "Sora", fontWeight: 700, fontSize: 18, cursor: "pointer",
-              }}>確認結帳並送單到後廚</button>
+                fontFamily: "Sora", fontWeight: 700, fontSize: 19, cursor: "pointer", lineHeight: 1.4,
+              }}>確認結帳<br />並送單</button>
             </div>
           </div>
         </div>
@@ -348,10 +355,10 @@ export default function FrontOfHousePOS() {
 function Numpad({ onDigit, onClear, onBackspace, disabled }) {
   const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "清除", "0", "⌫"];
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, opacity: disabled ? 0.4 : 1, pointerEvents: disabled ? "none" : "auto" }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, opacity: disabled ? 0.4 : 1, pointerEvents: disabled ? "none" : "auto" }}>
       {keys.map((k) => (
-        <button key={k} onClick={() => k === "清除" ? onClear() : k === "⌫" ? onBackspace() : onDigit(k)} style={{ padding: "16px 0", borderRadius: 10, border: `1px solid ${C.line}`, background: C.bg, color: C.ink, fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: 19, cursor: "pointer" }}>
-          {k === "⌫" ? <Delete size={18} style={{ margin: "0 auto" }} /> : k}
+        <button key={k} onClick={() => k === "清除" ? onClear() : k === "⌫" ? onBackspace() : onDigit(k)} style={{ padding: "20px 0", borderRadius: 12, border: `1px solid ${C.line}`, background: C.bg, color: C.ink, fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: 26, cursor: "pointer" }}>
+          {k === "⌫" ? <Delete size={22} style={{ margin: "0 auto" }} /> : k}
         </button>
       ))}
     </div>
