@@ -85,7 +85,7 @@ export default function KitchenDisplay() {
             <ChefHat size={20} color={C.amber} />
           </div>
           <div>
-            <div style={{ fontFamily: "Sora", fontWeight: 800, fontSize: 19 }}>後廚出單看板</div>
+            <div style={{ fontFamily: "Sora", fontWeight: 800, fontSize: 23 }}>後廚出單看板</div>
             <div style={{ fontSize: 11.5, color: C.faint, fontFamily: "IBM Plex Mono" }}>即時同步</div>
           </div>
         </div>
@@ -138,25 +138,25 @@ function OrderTicket({ o, now, onDone }) {
 
   return (
     <div style={{ background: C.panel, border: `2px solid ${palette[0]}`, borderRadius: 16, overflow: "hidden" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: palette[1] }}>
-        <span style={{ fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: 20 }}>#{o.no}</span>
-        <div style={{ display: "flex", alignItems: "center", gap: 5, color: palette[0], fontWeight: 700, fontSize: 13 }}>
-          <Clock size={13} /> {elapsedMin} 分鐘
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", background: palette[1] }}>
+        <span style={{ fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: 26 }}>#{o.no}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, color: palette[0], fontWeight: 700, fontSize: 16 }}>
+          <Clock size={16} /> {elapsedMin} 分鐘
         </div>
       </div>
-      <div style={{ padding: "14px 16px" }}>
+      <div style={{ padding: "16px 18px" }}>
         {o.items.map((i) => (
-          <div key={i.id} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px solid ${C.line}`, fontSize: 16 }}>
+          <div key={i.id} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: `1px solid ${C.line}`, fontSize: 20 }}>
             <span style={{ fontWeight: 600 }}>{i.name}</span>
             <span style={{ fontFamily: "IBM Plex Mono", fontWeight: 700, color: C.amber }}>× {i.qty}</span>
           </div>
         ))}
         <button onClick={onDone} style={{
-          width: "100%", marginTop: 14, padding: "12px 0", borderRadius: 10, border: "none",
-          background: C.green, color: "#0F1410", fontFamily: "Sora", fontWeight: 700, fontSize: 14.5, cursor: "pointer",
-          display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+          width: "100%", marginTop: 16, padding: "16px 0", borderRadius: 12, border: "none",
+          background: C.green, color: "#0F1410", fontFamily: "Sora", fontWeight: 700, fontSize: 18, cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
         }}>
-          <Check size={16} /> 出餐完成
+          <Check size={20} /> 出餐完成
         </button>
       </div>
     </div>

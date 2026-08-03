@@ -207,7 +207,7 @@ export default function FrontOfHousePOS() {
           {editMode ? (
             <input value={shopName} onChange={(e) => updateConfig({ shopName: e.target.value })} style={{ ...smallInputStyle, fontFamily: "Sora", fontWeight: 700, fontSize: 15, width: 160 }} />
           ) : (
-            <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 16 }}>{shopName} · 前台</div>
+            <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 19 }}>{shopName} · 前台</div>
           )}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -225,14 +225,14 @@ export default function FrontOfHousePOS() {
       </div>
 
       {view === "order" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", minHeight: "calc(100vh - 65px)" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 430px", minHeight: "calc(100vh - 65px)" }}>
           <div style={{ padding: 22 }}>
             <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
               {CATS.map((c) => (
                 <button key={c} onClick={() => setCat(c)} style={{
-                  padding: "10px 22px", borderRadius: 10, cursor: "pointer",
+                  padding: "16px 30px", borderRadius: 12, cursor: "pointer",
                   border: `1px solid ${cat === c ? C.ink : C.line}`, background: cat === c ? C.ink : C.surface,
-                  color: cat === c ? "#fff" : C.muted, fontFamily: "Sora", fontWeight: 700, fontSize: 13.5,
+                  color: cat === c ? "#fff" : C.muted, fontFamily: "Sora", fontWeight: 700, fontSize: 18,
                 }}>{c}</button>
               ))}
             </div>
@@ -245,7 +245,7 @@ export default function FrontOfHousePOS() {
               </div>
             )}
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: 14 }}>
               {products[cat].map((p) => (
                 editMode ? (
                   <div key={p.id} style={{ padding: 14, borderRadius: 14, background: C.surface, border: `1px solid ${C.line}` }}>
@@ -257,9 +257,9 @@ export default function FrontOfHousePOS() {
                     </div>
                   </div>
                 ) : (
-                  <button key={p.id} onClick={() => addToCart(p, cat)} style={{ textAlign: "left", padding: 16, borderRadius: 14, background: C.surface, border: `1px solid ${C.line}`, color: C.ink, cursor: "pointer" }}>
-                    <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 14.5, marginBottom: 8 }}>{p.name}</div>
-                    <div style={{ fontFamily: "IBM Plex Mono", color: C.gold, fontSize: 15, fontWeight: 600 }}>{money(p.price)}</div>
+                  <button key={p.id} onClick={() => addToCart(p, cat)} style={{ textAlign: "left", padding: 22, minHeight: 96, borderRadius: 16, background: C.surface, border: `1px solid ${C.line}`, color: C.ink, cursor: "pointer" }}>
+                    <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 19, marginBottom: 10, lineHeight: 1.3 }}>{p.name}</div>
+                    <div style={{ fontFamily: "IBM Plex Mono", color: C.gold, fontSize: 20, fontWeight: 700 }}>{money(p.price)}</div>
                   </button>
                 )
               ))}
@@ -273,22 +273,22 @@ export default function FrontOfHousePOS() {
 
           <div style={{ borderLeft: `1px solid ${C.line}`, background: C.surface, display: "flex", flexDirection: "column" }}>
             <div style={{ padding: "16px 18px 10px", display: "flex", alignItems: "center", gap: 8, borderBottom: `1px solid ${C.line}` }}>
-              <ShoppingCart size={15} color={C.gold} />
-              <span style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 14 }}>本次點單</span>
-              <span style={{ marginLeft: "auto", fontSize: 12, color: C.faint }}>{cart.reduce((s, i) => s + i.qty, 0)} 項</span>
+              <ShoppingCart size={18} color={C.gold} />
+              <span style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 17 }}>本次點單</span>
+              <span style={{ marginLeft: "auto", fontSize: 14, color: C.faint }}>{cart.reduce((s, i) => s + i.qty, 0)} 項</span>
             </div>
             <div style={{ flex: 1, overflowY: "auto", padding: "6px 18px", maxHeight: 260 }}>
               {cart.length === 0 && <div style={{ color: C.faint, fontSize: 13, textAlign: "center", marginTop: 30 }}>尚未選擇商品</div>}
               {cart.map((i) => (
                 <div key={i.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 0", borderBottom: `1px solid ${C.line}` }}>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13.5, fontWeight: 600 }}>{i.name}</div>
-                    <div style={{ fontSize: 11.5, color: C.faint, fontFamily: "IBM Plex Mono" }}>{money(i.price)} × {i.qty}</div>
+                    <div style={{ fontSize: 17, fontWeight: 600 }}>{i.name}</div>
+                    <div style={{ fontSize: 13.5, color: C.faint, fontFamily: "IBM Plex Mono" }}>{money(i.price)} × {i.qty}</div>
                   </div>
-                  <button onClick={() => changeQty(i.id, -1)} style={iconBtnStyle}><Minus size={13} /></button>
-                  <span style={{ width: 18, textAlign: "center", fontFamily: "IBM Plex Mono", fontSize: 13 }}>{i.qty}</span>
-                  <button onClick={() => changeQty(i.id, 1)} style={iconBtnStyle}><Plus size={13} /></button>
-                  <button onClick={() => removeItem(i.id)} style={{ ...iconBtnStyle, color: C.danger }}><Trash2 size={13} /></button>
+                  <button onClick={() => changeQty(i.id, -1)} style={iconBtnStyle}><Minus size={16} /></button>
+                  <span style={{ width: 24, textAlign: "center", fontFamily: "IBM Plex Mono", fontSize: 16, fontWeight: 600 }}>{i.qty}</span>
+                  <button onClick={() => changeQty(i.id, 1)} style={iconBtnStyle}><Plus size={16} /></button>
+                  <button onClick={() => removeItem(i.id)} style={{ ...iconBtnStyle, color: C.danger }}><Trash2 size={16} /></button>
                 </div>
               ))}
             </div>
@@ -303,16 +303,16 @@ export default function FrontOfHousePOS() {
               {discount > 0 && <Row label="套組折扣" value={`− ${money(discount)}`} color={C.green} />}
               <Row label="應收金額" value={money(total)} big />
               <div style={{ display: "flex", gap: 8, margin: "12px 0 8px" }}>
-                <input value={noChange ? String(total) : cash} onChange={(e) => { setCash(e.target.value.replace(/[^0-9]/g, "")); setNoChange(false); }} placeholder="客收現金" style={{ ...smallInputStyle, flex: 1, padding: "11px 14px", fontSize: 15, fontFamily: "IBM Plex Mono" }} />
-                <button onClick={() => setNoChange((v) => !v)} style={{ padding: "0 14px", borderRadius: 10, border: `1px solid ${noChange ? C.green : C.line}`, background: noChange ? C.greenSoft : "transparent", color: noChange ? C.green : C.muted, fontWeight: 600, fontSize: 12.5, cursor: "pointer", whiteSpace: "nowrap" }}>不找零</button>
+                <input value={noChange ? String(total) : cash} onChange={(e) => { setCash(e.target.value.replace(/[^0-9]/g, "")); setNoChange(false); }} placeholder="客收現金" style={{ ...smallInputStyle, flex: 1, padding: "14px 16px", fontSize: 19, fontFamily: "IBM Plex Mono" }} />
+                <button onClick={() => setNoChange((v) => !v)} style={{ padding: "0 18px", borderRadius: 10, border: `1px solid ${noChange ? C.green : C.line}`, background: noChange ? C.greenSoft : "transparent", color: noChange ? C.green : C.muted, fontWeight: 700, fontSize: 15, cursor: "pointer", whiteSpace: "nowrap" }}>不找零</button>
               </div>
               <Numpad onDigit={(d) => setCash((c) => (noChange ? "" : c) + d)} onClear={() => { setCash(""); setNoChange(false); }} onBackspace={() => setCash((c) => c.slice(0, -1))} disabled={noChange} />
               <Row label="找零" value={cash === "" && !noChange ? "—" : money(change)} color={C.gold} style={{ marginTop: 10 }} />
               <button disabled={cart.length === 0 || (!noChange && cashNum < total)} onClick={checkout} style={{
-                width: "100%", marginTop: 12, padding: "14px 0", borderRadius: 12, border: "none",
+                width: "100%", marginTop: 14, padding: "18px 0", borderRadius: 14, border: "none",
                 background: (cart.length && (noChange || cashNum >= total)) ? C.ink : C.line,
                 color: (cart.length && (noChange || cashNum >= total)) ? "#fff" : C.faint,
-                fontFamily: "Sora", fontWeight: 700, fontSize: 15, cursor: "pointer",
+                fontFamily: "Sora", fontWeight: 700, fontSize: 18, cursor: "pointer",
               }}>確認結帳並送單到後廚</button>
             </div>
           </div>
@@ -350,8 +350,8 @@ function Numpad({ onDigit, onClear, onBackspace, disabled }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, opacity: disabled ? 0.4 : 1, pointerEvents: disabled ? "none" : "auto" }}>
       {keys.map((k) => (
-        <button key={k} onClick={() => k === "清除" ? onClear() : k === "⌫" ? onBackspace() : onDigit(k)} style={{ padding: "10px 0", borderRadius: 8, border: `1px solid ${C.line}`, background: C.bg, color: C.ink, fontFamily: "IBM Plex Mono", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>
-          {k === "⌫" ? <Delete size={14} style={{ margin: "0 auto" }} /> : k}
+        <button key={k} onClick={() => k === "清除" ? onClear() : k === "⌫" ? onBackspace() : onDigit(k)} style={{ padding: "16px 0", borderRadius: 10, border: `1px solid ${C.line}`, background: C.bg, color: C.ink, fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: 19, cursor: "pointer" }}>
+          {k === "⌫" ? <Delete size={18} style={{ margin: "0 auto" }} /> : k}
         </button>
       ))}
     </div>
@@ -359,14 +359,14 @@ function Numpad({ onDigit, onClear, onBackspace, disabled }) {
 }
 function Row({ label, value, muted, big, color, style }) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 0", ...style }}>
-      <span style={{ fontSize: big ? 14.5 : 12.5, color: muted ? C.faint : C.ink, fontWeight: big ? 700 : 500, fontFamily: big ? "Sora" : "Inter" }}>{label}</span>
-      <span style={{ fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: big ? 20 : 13.5, color: color || (big ? C.ink : C.muted) }}>{value}</span>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "5px 0", ...style }}>
+      <span style={{ fontSize: big ? 18 : 15, color: muted ? C.faint : C.ink, fontWeight: big ? 700 : 500, fontFamily: big ? "Sora" : "Inter" }}>{label}</span>
+      <span style={{ fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: big ? 26 : 17, color: color || (big ? C.ink : C.muted) }}>{value}</span>
     </div>
   );
 }
-const iconBtnStyle = { width: 24, height: 24, borderRadius: 7, border: `1px solid ${C.line}`, background: "transparent", color: C.ink, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" };
-const smallInputStyle = { padding: "7px 10px", borderRadius: 8, border: `1px solid ${C.line}`, background: C.bg, color: C.ink, fontSize: 13, outline: "none", boxSizing: "border-box" };
+const iconBtnStyle = { width: 34, height: 34, borderRadius: 9, border: `1px solid ${C.line}`, background: "transparent", color: C.ink, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" };
+const smallInputStyle = { padding: "9px 12px", borderRadius: 9, border: `1px solid ${C.line}`, background: C.bg, color: C.ink, fontSize: 15, outline: "none", boxSizing: "border-box" };
 
 function Toast({ order, onClose }) {
   useEffect(() => { const t = setTimeout(onClose, 3000); return () => clearTimeout(t); }, [onClose]);
