@@ -225,9 +225,9 @@ export default function FrontOfHousePOS() {
       </div>
 
       {view === "order" && (
-        <div style={{ display: "flex", flexDirection: "column", minHeight: "calc(100vh - 65px)" }}>
-          {/* product area — top, full width */}
-          <div style={{ flex: 1, padding: "12px 18px 8px", overflowY: "auto" }}>
+        <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 65px)" }}>
+          {/* product area — top, only as tall as its content needs */}
+          <div style={{ flexShrink: 0, padding: "12px 18px 8px", overflowY: "auto", maxHeight: "46vh" }}>
             <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
               {CATS.map((c) => (
                 <button key={c} onClick={() => setCat(c)} style={{
@@ -272,8 +272,8 @@ export default function FrontOfHousePOS() {
             </div>
           </div>
 
-          {/* checkout bar — bottom, fixed, full width, keypad-dominant */}
-          <div style={{ borderTop: `1px solid ${C.line}`, background: C.surface, display: "flex", flexDirection: "column" }}>
+          {/* checkout bar — bottom, fills all remaining space, keypad-dominant */}
+          <div style={{ borderTop: `1px solid ${C.line}`, background: C.surface, display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
 
             {/* thin summary strip */}
             <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "8px 18px", borderBottom: `1px solid ${C.line}` }}>
@@ -298,10 +298,10 @@ export default function FrontOfHousePOS() {
               </div>
             </div>
 
-            {/* mega keypad + merged confirm key */}
+            {/* mega keypad + merged confirm key — stretches to fill all remaining height */}
             <div style={{
               display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1.3fr", gridTemplateRows: "repeat(4, 1fr)",
-              gap: 6, padding: "6px 10px 10px", height: 260,
+              gap: 8, padding: "8px 12px 12px", flex: 1, minHeight: 0,
             }}>
               {["1", "2", "3", "4", "5", "6", "7", "8", "9", "清除", "0", "⌫"].map((k, idx) => (
                 <button
@@ -309,20 +309,20 @@ export default function FrontOfHousePOS() {
                   onClick={() => { if (noChange) return; k === "清除" ? (setCash(""), setNoChange(false)) : k === "⌫" ? setCash((c) => c.slice(0, -1)) : setCash((c) => c + k); }}
                   style={{
                     gridColumn: (idx % 3) + 1, gridRow: Math.floor(idx / 3) + 1,
-                    borderRadius: 12, border: `1px solid ${C.line}`, background: C.bg, color: C.ink,
-                    fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: 30, cursor: "pointer",
+                    borderRadius: 14, border: `1px solid ${C.line}`, background: C.bg, color: C.ink,
+                    fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: 40, cursor: "pointer",
                     opacity: noChange ? 0.4 : 1, pointerEvents: noChange ? "none" : "auto",
                     display: "flex", alignItems: "center", justifyContent: "center",
                   }}
                 >
-                  {k === "⌫" ? <Delete size={26} /> : k}
+                  {k === "⌫" ? <Delete size={34} /> : k}
                 </button>
               ))}
               <button disabled={cart.length === 0 || (!noChange && cashNum < total)} onClick={checkout} style={{
-                gridColumn: 4, gridRow: "1 / span 4", borderRadius: 16, border: "none",
+                gridColumn: 4, gridRow: "1 / span 4", borderRadius: 18, border: "none",
                 background: (cart.length && (noChange || cashNum >= total)) ? C.ink : C.line,
                 color: (cart.length && (noChange || cashNum >= total)) ? "#fff" : C.faint,
-                fontFamily: "Sora", fontWeight: 700, fontSize: 22, cursor: "pointer", lineHeight: 1.5,
+                fontFamily: "Sora", fontWeight: 700, fontSize: 28, cursor: "pointer", lineHeight: 1.5,
               }}>確認結帳<br />並送單</button>
             </div>
           </div>
