@@ -225,7 +225,7 @@ export default function FrontOfHousePOS() {
       </div>
 
       {view === "order" && (
-        <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 65px)" }}>
+        <div style={{ display: "flex", flexDirection: "column", height: "calc(100dvh - 65px)" }}>
           {/* product area — top, only as tall as its content needs */}
           <div style={{ flexShrink: 0, padding: "12px 18px 8px", overflowY: "auto", maxHeight: "46vh" }}>
             <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
