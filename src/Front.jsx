@@ -230,7 +230,7 @@ export default function FrontOfHousePOS() {
         <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 540px", minHeight: 0 }}>
 
           {/* LEFT — menu */}
-          <div style={{ padding: "18px 22px", overflowY: "auto" }}>
+          <div style={{ padding: "18px 22px", overflowY: "auto", display: "flex", flexDirection: "column", justifyContent: "center" }}>
             <div style={{ display: "flex", gap: 10, marginBottom: 18 }}>
               {CATS.map((c) => (
                 <button key={c} onClick={() => setCat(c)} style={{
@@ -249,7 +249,7 @@ export default function FrontOfHousePOS() {
               </div>
             )}
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 20 }}>
               {products[cat].map((p) => (
                 editMode ? (
                   <div key={p.id} style={{ padding: 14, borderRadius: 14, background: C.surface, border: `1px solid ${C.line}` }}>
@@ -261,9 +261,9 @@ export default function FrontOfHousePOS() {
                     </div>
                   </div>
                 ) : (
-                  <button key={p.id} onClick={() => addToCart(p, cat)} style={{ textAlign: "left", padding: 26, minHeight: 118, borderRadius: 16, background: C.surface, border: `1px solid ${C.line}`, color: C.ink, cursor: "pointer" }}>
-                    <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 23, marginBottom: 10, lineHeight: 1.3 }}>{p.name}</div>
-                    <div style={{ fontFamily: "IBM Plex Mono", color: C.gold, fontSize: 24, fontWeight: 700 }}>{money(p.price)}</div>
+                  <button key={p.id} onClick={() => addToCart(p, cat)} style={{ textAlign: "left", padding: 30, minHeight: 150, borderRadius: 18, background: C.surface, border: `1px solid ${C.line}`, color: C.ink, cursor: "pointer" }}>
+                    <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 25, marginBottom: 12, lineHeight: 1.3 }}>{p.name}</div>
+                    <div style={{ fontFamily: "IBM Plex Mono", color: C.gold, fontSize: 26, fontWeight: 700 }}>{money(p.price)}</div>
                   </button>
                 )
               ))}
@@ -276,7 +276,7 @@ export default function FrontOfHousePOS() {
           </div>
 
           {/* RIGHT — cart + numpad + checkout, fixed sidebar */}
-          <div style={{ borderLeft: `1px solid ${C.line}`, background: C.surface, display: "flex", flexDirection: "column", minHeight: 0 }}>
+          <div style={{ borderLeft: `1px solid ${C.line}`, background: C.surface, display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: 0 }}>
 
             <div style={{ padding: "18px 24px 12px", display: "flex", alignItems: "center", gap: 8, borderBottom: `1px solid ${C.line}` }}>
               <ShoppingCart size={20} color={C.gold} />
@@ -359,8 +359,8 @@ function Numpad({ onDigit, onClear, onBackspace, disabled }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, opacity: disabled ? 0.4 : 1, pointerEvents: disabled ? "none" : "auto" }}>
       {keys.map((k) => (
-        <button key={k} onClick={() => k === "清除" ? onClear() : k === "⌫" ? onBackspace() : onDigit(k)} style={{ padding: "22px 0", borderRadius: 13, border: `1px solid ${C.line}`, background: C.bg, color: C.ink, fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: 28, cursor: "pointer" }}>
-          {k === "⌫" ? <Delete size={24} style={{ margin: "0 auto" }} /> : k}
+        <button key={k} onClick={() => k === "清除" ? onClear() : k === "⌫" ? onBackspace() : onDigit(k)} style={{ padding: "26px 0", borderRadius: 14, border: `1px solid ${C.line}`, background: C.bg, color: C.ink, fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: 32, cursor: "pointer" }}>
+          {k === "⌫" ? <Delete size={27} style={{ margin: "0 auto" }} /> : k}
         </button>
       ))}
     </div>
