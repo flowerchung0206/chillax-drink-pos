@@ -227,7 +227,7 @@ export default function FrontOfHousePOS() {
       </div>
 
       {view === "order" && (
-        <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 400px", minHeight: 0 }}>
+        <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 540px", minHeight: 0 }}>
 
           {/* LEFT — menu */}
           <div style={{ padding: "18px 22px", overflowY: "auto" }}>
@@ -261,9 +261,9 @@ export default function FrontOfHousePOS() {
                     </div>
                   </div>
                 ) : (
-                  <button key={p.id} onClick={() => addToCart(p, cat)} style={{ textAlign: "left", padding: 24, minHeight: 110, borderRadius: 16, background: C.surface, border: `1px solid ${C.line}`, color: C.ink, cursor: "pointer" }}>
-                    <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 21, marginBottom: 10, lineHeight: 1.3 }}>{p.name}</div>
-                    <div style={{ fontFamily: "IBM Plex Mono", color: C.gold, fontSize: 22, fontWeight: 700 }}>{money(p.price)}</div>
+                  <button key={p.id} onClick={() => addToCart(p, cat)} style={{ textAlign: "left", padding: 26, minHeight: 118, borderRadius: 16, background: C.surface, border: `1px solid ${C.line}`, color: C.ink, cursor: "pointer" }}>
+                    <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 23, marginBottom: 10, lineHeight: 1.3 }}>{p.name}</div>
+                    <div style={{ fontFamily: "IBM Plex Mono", color: C.gold, fontSize: 24, fontWeight: 700 }}>{money(p.price)}</div>
                   </button>
                 )
               ))}
@@ -278,50 +278,50 @@ export default function FrontOfHousePOS() {
           {/* RIGHT — cart + numpad + checkout, fixed sidebar */}
           <div style={{ borderLeft: `1px solid ${C.line}`, background: C.surface, display: "flex", flexDirection: "column", minHeight: 0 }}>
 
-            <div style={{ padding: "16px 20px 10px", display: "flex", alignItems: "center", gap: 8, borderBottom: `1px solid ${C.line}` }}>
-              <ShoppingCart size={17} color={C.gold} />
-              <span style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 16 }}>本次點單</span>
-              <span style={{ marginLeft: "auto", fontSize: 13, color: C.faint }}>{cart.reduce((s, i) => s + i.qty, 0)} 項</span>
+            <div style={{ padding: "18px 24px 12px", display: "flex", alignItems: "center", gap: 8, borderBottom: `1px solid ${C.line}` }}>
+              <ShoppingCart size={20} color={C.gold} />
+              <span style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 19 }}>本次點單</span>
+              <span style={{ marginLeft: "auto", fontSize: 14, color: C.faint }}>{cart.reduce((s, i) => s + i.qty, 0)} 項</span>
             </div>
 
-            <div style={{ flex: "0 1 auto", overflowY: "auto", padding: "6px 20px", maxHeight: "28vh" }}>
-              {cart.length === 0 && <div style={{ color: C.faint, fontSize: 14, textAlign: "center", marginTop: 24 }}>尚未選擇商品</div>}
+            <div style={{ flex: "0 1 auto", overflowY: "auto", padding: "8px 24px", maxHeight: "26vh" }}>
+              {cart.length === 0 && <div style={{ color: C.faint, fontSize: 16, textAlign: "center", marginTop: 24 }}>尚未選擇商品</div>}
               {cart.map((i) => (
-                <div key={i.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 0", borderBottom: `1px solid ${C.line}` }}>
+                <div key={i.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 0", borderBottom: `1px solid ${C.line}` }}>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 15.5, fontWeight: 600 }}>{i.name}</div>
-                    <div style={{ fontSize: 12.5, color: C.faint, fontFamily: "IBM Plex Mono" }}>{money(i.price)} × {i.qty}</div>
+                    <div style={{ fontSize: 18, fontWeight: 600 }}>{i.name}</div>
+                    <div style={{ fontSize: 14, color: C.faint, fontFamily: "IBM Plex Mono" }}>{money(i.price)} × {i.qty}</div>
                   </div>
-                  <button onClick={() => changeQty(i.id, -1)} style={iconBtnStyle}><Minus size={14} /></button>
-                  <span style={{ width: 20, textAlign: "center", fontFamily: "IBM Plex Mono", fontSize: 14, fontWeight: 600 }}>{i.qty}</span>
-                  <button onClick={() => changeQty(i.id, 1)} style={iconBtnStyle}><Plus size={14} /></button>
-                  <button onClick={() => removeItem(i.id)} style={{ ...iconBtnStyle, color: C.danger }}><Trash2 size={14} /></button>
+                  <button onClick={() => changeQty(i.id, -1)} style={iconBtnStyle}><Minus size={16} /></button>
+                  <span style={{ width: 24, textAlign: "center", fontFamily: "IBM Plex Mono", fontSize: 16, fontWeight: 600 }}>{i.qty}</span>
+                  <button onClick={() => changeQty(i.id, 1)} style={iconBtnStyle}><Plus size={16} /></button>
+                  <button onClick={() => removeItem(i.id)} style={{ ...iconBtnStyle, color: C.danger }}><Trash2 size={16} /></button>
                 </div>
               ))}
             </div>
 
-            <div style={{ padding: "10px 20px", borderTop: `1px solid ${C.line}`, flexShrink: 0 }}>
+            <div style={{ padding: "12px 24px", borderTop: `1px solid ${C.line}`, flexShrink: 0 }}>
               {comboPairs > 0 && (
-                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: C.green, fontWeight: 600, marginBottom: 6 }}>
-                  <Tag size={12} /> 已套用 {comboPairs} 組套組折扣
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14, color: C.green, fontWeight: 600, marginBottom: 8 }}>
+                  <Tag size={14} /> 已套用 {comboPairs} 組套組折扣
                 </div>
               )}
               {discount > 0 && <Row label="套組折扣" value={`− ${money(discount)}`} color={C.green} />}
               <Row label="應收金額" value={money(total)} big />
             </div>
 
-            <div style={{ padding: "10px 20px", flexShrink: 0 }}>
-              <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                <input value={noChange ? String(total) : cash} onChange={(e) => { setCash(e.target.value.replace(/[^0-9]/g, "")); setNoChange(false); }} placeholder="客收現金" style={{ ...smallInputStyle, flex: 1, padding: "12px 14px", fontSize: 18, fontFamily: "IBM Plex Mono" }} />
-                <button onClick={() => setNoChange((v) => !v)} style={{ padding: "0 16px", borderRadius: 10, border: `1px solid ${noChange ? C.green : C.line}`, background: noChange ? C.greenSoft : "transparent", color: noChange ? C.green : C.muted, fontWeight: 700, fontSize: 14, cursor: "pointer", whiteSpace: "nowrap" }}>不找零</button>
+            <div style={{ padding: "12px 24px 20px", flexShrink: 0 }}>
+              <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
+                <input value={noChange ? String(total) : cash} onChange={(e) => { setCash(e.target.value.replace(/[^0-9]/g, "")); setNoChange(false); }} placeholder="客收現金" style={{ ...smallInputStyle, flex: 1, padding: "16px 18px", fontSize: 24, fontFamily: "IBM Plex Mono" }} />
+                <button onClick={() => setNoChange((v) => !v)} style={{ padding: "0 18px", borderRadius: 12, border: `1px solid ${noChange ? C.green : C.line}`, background: noChange ? C.greenSoft : "transparent", color: noChange ? C.green : C.muted, fontWeight: 700, fontSize: 16, cursor: "pointer", whiteSpace: "nowrap" }}>不找零</button>
               </div>
               <Numpad onDigit={(d) => setCash((c) => (noChange ? "" : c) + d)} onClear={() => { setCash(""); setNoChange(false); }} onBackspace={() => setCash((c) => c.slice(0, -1))} disabled={noChange} />
-              <Row label="找零" value={cash === "" && !noChange ? "—" : money(change)} color={C.gold} style={{ marginTop: 8 }} />
+              <Row label="找零" value={cash === "" && !noChange ? "—" : money(change)} color={C.gold} style={{ marginTop: 10 }} />
               <button disabled={cart.length === 0 || (!noChange && cashNum < total)} onClick={checkout} style={{
-                width: "100%", marginTop: 10, padding: "16px 0", borderRadius: 14, border: "none",
+                width: "100%", marginTop: 12, padding: "20px 0", borderRadius: 16, border: "none",
                 background: (cart.length && (noChange || cashNum >= total)) ? C.ink : C.line,
                 color: (cart.length && (noChange || cashNum >= total)) ? "#fff" : C.faint,
-                fontFamily: "Sora", fontWeight: 700, fontSize: 17, cursor: "pointer",
+                fontFamily: "Sora", fontWeight: 700, fontSize: 20, cursor: "pointer",
               }}>確認結帳並送單到後廚</button>
             </div>
           </div>
@@ -357,10 +357,10 @@ export default function FrontOfHousePOS() {
 function Numpad({ onDigit, onClear, onBackspace, disabled }) {
   const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "清除", "0", "⌫"];
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, opacity: disabled ? 0.4 : 1, pointerEvents: disabled ? "none" : "auto" }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, opacity: disabled ? 0.4 : 1, pointerEvents: disabled ? "none" : "auto" }}>
       {keys.map((k) => (
-        <button key={k} onClick={() => k === "清除" ? onClear() : k === "⌫" ? onBackspace() : onDigit(k)} style={{ padding: "16px 0", borderRadius: 11, border: `1px solid ${C.line}`, background: C.bg, color: C.ink, fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: 22, cursor: "pointer" }}>
-          {k === "⌫" ? <Delete size={19} style={{ margin: "0 auto" }} /> : k}
+        <button key={k} onClick={() => k === "清除" ? onClear() : k === "⌫" ? onBackspace() : onDigit(k)} style={{ padding: "22px 0", borderRadius: 13, border: `1px solid ${C.line}`, background: C.bg, color: C.ink, fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: 28, cursor: "pointer" }}>
+          {k === "⌫" ? <Delete size={24} style={{ margin: "0 auto" }} /> : k}
         </button>
       ))}
     </div>
@@ -368,13 +368,13 @@ function Numpad({ onDigit, onClear, onBackspace, disabled }) {
 }
 function Row({ label, value, muted, big, color, style }) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 0", ...style }}>
-      <span style={{ fontSize: big ? 16 : 13.5, color: muted ? C.faint : C.ink, fontWeight: big ? 700 : 500, fontFamily: big ? "Sora" : "Inter" }}>{label}</span>
-      <span style={{ fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: big ? 22 : 15, color: color || (big ? C.ink : C.muted) }}>{value}</span>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "5px 0", ...style }}>
+      <span style={{ fontSize: big ? 19 : 15, color: muted ? C.faint : C.ink, fontWeight: big ? 700 : 500, fontFamily: big ? "Sora" : "Inter" }}>{label}</span>
+      <span style={{ fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: big ? 27 : 17, color: color || (big ? C.ink : C.muted) }}>{value}</span>
     </div>
   );
 }
-const iconBtnStyle = { width: 28, height: 28, borderRadius: 8, border: `1px solid ${C.line}`, background: "transparent", color: C.ink, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" };
+const iconBtnStyle = { width: 34, height: 34, borderRadius: 9, border: `1px solid ${C.line}`, background: "transparent", color: C.ink, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" };
 const smallInputStyle = { padding: "8px 11px", borderRadius: 9, border: `1px solid ${C.line}`, background: C.bg, color: C.ink, fontSize: 14, outline: "none", boxSizing: "border-box" };
 
 function Toast({ order, onClose }) {
