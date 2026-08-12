@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ChefHat, Check, RotateCcw, WifiOff, Clock, Volume2, VolumeX } from "lucide-react";
+import { ChefHat, Check, RotateCcw, WifiOff, Clock, Volume2, VolumeX, Footprints, ClipboardCheck } from "lucide-react";
 import { dbGet, dbSet, dbListen } from "./store.js";
 
 const C = {
@@ -8,6 +8,7 @@ const C = {
   green: "#5FAE81", greenSoft: "rgba(95,174,129,0.14)",
   amber: "#D3A24B", amberSoft: "rgba(211,162,75,0.14)",
   red: "#D06A5E", redSoft: "rgba(208,106,94,0.16)",
+  blue: "#6FA8D3", blueSoft: "rgba(111,168,211,0.16)",
 };
 const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@600;700&display=swap');`;
 
@@ -39,8 +40,21 @@ function OfflineBadge() {
   );
 }
 
+function StationTag({ station }) {
+  const isRoam = station === "流動";
+  return (
+    <span style={{
+      display: "flex", alignItems: "center", gap: 4, padding: "3px 9px", borderRadius: 999, fontSize: 11.5, fontWeight: 700,
+      background: isRoam ? C.amberSoft : C.blueSoft, color: isRoam ? C.amber : C.blue,
+    }}>
+      {isRoam ? <Footprints size={11} /> : <ClipboardCheck size={11} />} {station || "櫃台"}
+    </span>
+  );
+}
+
 /* =========================================================
    KITCHEN DISPLAY — realtime, no polling needed
+   flow: pending (待製作) -> ready (待取餐, front station sees + collects) -> collected (hidden here)
 ========================================================= */
 export default function KitchenDisplay() {
   const [orders, setOrders] = useState([]);
@@ -65,98 +79,101 @@ export default function KitchenDisplay() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const toggleStatus = async (id) => {
+  const setStatus = async (id, status) => {
     const latest = await dbGet("pos/orders", orders);
-    const next = latest.map((o) => o.id === id ? { ...o, status: o.status === "pending" ? "done" : "pending" } : o);
+    const next = latest.map((o) => o.id === id ? { ...o, status } : o);
     await dbSet("pos/orders", next);
   };
 
   const pending = [...orders.filter((o) => o.status === "pending")].sort((a, b) => new Date(a.time) - new Date(b.time));
-  const done = [...orders.filter((o) => o.status === "done")].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 12);
+  const readyList = [...orders.filter((o) => o.status === "ready")].sort((a, b) => new Date(a.time) - new Date(b.time));
 
-  if (!ready) return <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", color: C.muted, fontFamily: "Inter" }}>連線 Firebase 中…</div>;
+  if (!ready) return <div style={{ height: "100dvh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", color: C.muted, fontFamily: "Inter" }}>連線中…</div>;
 
   return (
-    <div style={{ minHeight: "100vh", background: C.bg, color: C.cream, fontFamily: "Inter" }}>
+    <div style={{ height: "100dvh", background: C.bg, color: C.cream, fontFamily: "Inter", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <style>{FONTS}</style>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", borderBottom: `1px solid ${C.line}` }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 38, height: 38, borderRadius: 10, background: C.amberSoft, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <ChefHat size={20} color={C.amber} />
+
+      <div style={{ flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 22px", borderBottom: `1px solid ${C.line}` }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 34, height: 34, borderRadius: 9, background: C.amberSoft, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <ChefHat size={18} color={C.amber} />
           </div>
-          <div>
-            <div style={{ fontFamily: "Sora", fontWeight: 800, fontSize: 23 }}>後廚出單看板</div>
-            <div style={{ fontSize: 11.5, color: C.faint, fontFamily: "IBM Plex Mono" }}>即時同步</div>
-          </div>
+          <div style={{ fontFamily: "Sora", fontWeight: 800, fontSize: 19 }}>後廚出單看板</div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <OfflineBadge />
-          <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 15, color: C.amber }}>待製作 {pending.length} 單</div>
+          <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 14, color: C.amber }}>待製作 {pending.length}</div>
+          <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 14, color: C.blue }}>待取餐 {readyList.length}</div>
           <button onClick={() => setSoundOn((v) => !v)} style={{
-            width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.line}`, background: C.panel,
+            width: 34, height: 34, borderRadius: 9, border: `1px solid ${C.line}`, background: C.panel,
             color: soundOn ? C.amber : C.faint, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
           }}>
-            {soundOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
+            {soundOn ? <Volume2 size={15} /> : <VolumeX size={15} />}
           </button>
         </div>
       </div>
 
-      <div style={{ padding: 22 }}>
-        {pending.length === 0 ? (
-          <div style={{ textAlign: "center", color: C.faint, fontSize: 16, padding: "80px 0" }}>目前沒有待製作的訂單</div>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
-            {pending.map((o) => <OrderTicket key={o.id} o={o} now={now} onDone={() => toggleStatus(o.id)} />)}
+      <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 0 }}>
+        <div style={{ padding: 16, overflowY: "auto", borderRight: `1px solid ${C.line}` }}>
+          <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 13, color: C.amber, marginBottom: 10 }}>待製作</div>
+          {pending.length === 0 && <div style={{ textAlign: "center", color: C.faint, fontSize: 14, padding: "40px 0" }}>目前沒有待製作的訂單</div>}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", gap: 12 }}>
+            {pending.map((o) => (
+              <OrderTicket key={o.id} o={o} now={now}
+                actionLabel="出餐完成" actionColor={C.green}
+                onAction={() => setStatus(o.id, "ready")} />
+            ))}
           </div>
-        )}
-
-        {done.length > 0 && (
-          <div style={{ marginTop: 32 }}>
-            <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 14, color: C.faint, marginBottom: 12 }}>最近已完成</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-              {done.map((o) => (
-                <button key={o.id} onClick={() => toggleStatus(o.id)} style={{
-                  display: "flex", alignItems: "center", gap: 8, padding: "8px 14px", borderRadius: 10,
-                  border: `1px solid ${C.line}`, background: C.panel, color: C.muted, cursor: "pointer", fontSize: 12.5,
-                }}>
-                  <Check size={12} color={C.green} /> #{o.no}
-                  <RotateCcw size={11} style={{ opacity: 0.5 }} />
-                </button>
-              ))}
-            </div>
+        </div>
+        <div style={{ padding: 16, overflowY: "auto" }}>
+          <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 13, color: C.blue, marginBottom: 10 }}>待取餐（等對應站別取走）</div>
+          {readyList.length === 0 && <div style={{ textAlign: "center", color: C.faint, fontSize: 14, padding: "40px 0" }}>目前沒有待取餐的訂單</div>}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", gap: 12 }}>
+            {readyList.map((o) => (
+              <OrderTicket key={o.id} o={o} now={now}
+                actionLabel="退回待製作" actionColor={C.muted} actionIcon={RotateCcw}
+                onAction={() => setStatus(o.id, "pending")} muted />
+            ))}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
 }
 
-function OrderTicket({ o, now, onDone }) {
+function OrderTicket({ o, now, actionLabel, actionColor, actionIcon: ActionIcon = Check, onAction, muted }) {
   const elapsedMin = Math.floor((now - new Date(o.time).getTime()) / 60000);
-  const urgency = elapsedMin >= 10 ? "red" : elapsedMin >= 5 ? "amber" : "green";
-  const palette = { red: [C.red, C.redSoft], amber: [C.amber, C.amberSoft], green: [C.green, C.greenSoft] }[urgency];
+  const urgency = muted ? "muted" : elapsedMin >= 10 ? "red" : elapsedMin >= 5 ? "amber" : "green";
+  const palette = { red: [C.red, C.redSoft], amber: [C.amber, C.amberSoft], green: [C.green, C.greenSoft], muted: [C.faint, "rgba(255,255,255,0.04)"] }[urgency];
 
   return (
-    <div style={{ background: C.panel, border: `2px solid ${palette[0]}`, borderRadius: 16, overflow: "hidden" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", background: palette[1] }}>
-        <span style={{ fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: 26 }}>#{o.no}</span>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, color: palette[0], fontWeight: 700, fontSize: 16 }}>
-          <Clock size={16} /> {elapsedMin} 分鐘
+    <div style={{ background: C.panel, border: `2px solid ${palette[0]}`, borderRadius: 14, overflow: "hidden" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", background: palette[1] }}>
+        <span style={{ fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: 18 }}>#{o.no}</span>
+        <StationTag station={o.station} />
+        {o.isVendor && (
+          <span style={{ padding: "3px 9px", borderRadius: 999, fontSize: 11.5, fontWeight: 700, background: "rgba(176,129,47,0.2)", color: C.amber }}>
+            攤位 {o.booth || "未填"}
+          </span>
+        )}
+        <div style={{ display: "flex", alignItems: "center", gap: 4, color: palette[0], fontWeight: 700, fontSize: 12 }}>
+          <Clock size={12} /> {elapsedMin}分
         </div>
       </div>
-      <div style={{ padding: "16px 18px" }}>
+      <div style={{ padding: "12px 14px" }}>
         {o.items.map((i) => (
-          <div key={i.id} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: `1px solid ${C.line}`, fontSize: 20 }}>
+          <div key={i.id} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: `1px solid ${C.line}`, fontSize: 15 }}>
             <span style={{ fontWeight: 600 }}>{i.name}</span>
             <span style={{ fontFamily: "IBM Plex Mono", fontWeight: 700, color: C.amber }}>× {i.qty}</span>
           </div>
         ))}
-        <button onClick={onDone} style={{
-          width: "100%", marginTop: 16, padding: "16px 0", borderRadius: 12, border: "none",
-          background: C.green, color: "#0F1410", fontFamily: "Sora", fontWeight: 700, fontSize: 18, cursor: "pointer",
-          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+        <button onClick={onAction} style={{
+          width: "100%", marginTop: 12, padding: "11px 0", borderRadius: 9, border: "none",
+          background: actionColor, color: muted ? C.cream : "#0F1410", fontFamily: "Sora", fontWeight: 700, fontSize: 13, cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
         }}>
-          <Check size={20} /> 出餐完成
+          <ActionIcon size={14} /> {actionLabel}
         </button>
       </div>
     </div>
