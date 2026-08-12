@@ -96,15 +96,15 @@ export default function KitchenDisplay() {
 
       <div style={{ flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 22px", borderBottom: `1px solid ${C.line}` }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 34, height: 34, borderRadius: 9, background: C.amberSoft, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <ChefHat size={18} color={C.amber} />
+          <div style={{ width: 42, height: 42, borderRadius: 11, background: C.amberSoft, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <ChefHat size={22} color={C.amber} />
           </div>
-          <div style={{ fontFamily: "Sora", fontWeight: 800, fontSize: 19 }}>後廚出單看板</div>
+          <div style={{ fontFamily: "Sora", fontWeight: 800, fontSize: 24 }}>後廚出單看板</div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <OfflineBadge />
-          <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 14, color: C.amber }}>待製作 {pending.length}</div>
-          <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 14, color: C.blue }}>待取餐 {readyList.length}</div>
+          <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 18, color: C.amber }}>待製作 {pending.length}</div>
+          <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 18, color: C.blue }}>待取餐 {readyList.length}</div>
           <button onClick={() => setSoundOn((v) => !v)} style={{
             width: 34, height: 34, borderRadius: 9, border: `1px solid ${C.line}`, background: C.panel,
             color: soundOn ? C.amber : C.faint, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
@@ -116,8 +116,8 @@ export default function KitchenDisplay() {
 
       <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 0 }}>
         <div style={{ padding: 16, overflowY: "auto", borderRight: `1px solid ${C.line}` }}>
-          <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 13, color: C.amber, marginBottom: 10 }}>待製作</div>
-          {pending.length === 0 && <div style={{ textAlign: "center", color: C.faint, fontSize: 14, padding: "40px 0" }}>目前沒有待製作的訂單</div>}
+          <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 17, color: C.amber, marginBottom: 12 }}>待製作</div>
+          {pending.length === 0 && <div style={{ textAlign: "center", color: C.faint, fontSize: 17, padding: "40px 0" }}>目前沒有待製作的訂單</div>}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", gap: 12 }}>
             {pending.map((o) => (
               <OrderTicket key={o.id} o={o} now={now}
@@ -127,8 +127,8 @@ export default function KitchenDisplay() {
           </div>
         </div>
         <div style={{ padding: 16, overflowY: "auto" }}>
-          <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 13, color: C.blue, marginBottom: 10 }}>待取餐（等對應站別取走）</div>
-          {readyList.length === 0 && <div style={{ textAlign: "center", color: C.faint, fontSize: 14, padding: "40px 0" }}>目前沒有待取餐的訂單</div>}
+          <div style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 17, color: C.blue, marginBottom: 12 }}>待取餐（等對應站別取走）</div>
+          {readyList.length === 0 && <div style={{ textAlign: "center", color: C.faint, fontSize: 17, padding: "40px 0" }}>目前沒有待取餐的訂單</div>}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", gap: 12 }}>
             {readyList.map((o) => (
               <OrderTicket key={o.id} o={o} now={now}
@@ -150,30 +150,30 @@ function OrderTicket({ o, now, actionLabel, actionColor, actionIcon: ActionIcon 
   return (
     <div style={{ background: C.panel, border: `2px solid ${palette[0]}`, borderRadius: 14, overflow: "hidden" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", background: palette[1] }}>
-        <span style={{ fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: 18 }}>#{o.no}</span>
+        <span style={{ fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: 24 }}>#{o.no}</span>
         <StationTag station={o.station} />
         {o.isVendor && (
           <span style={{ padding: "3px 9px", borderRadius: 999, fontSize: 11.5, fontWeight: 700, background: "rgba(176,129,47,0.2)", color: C.amber }}>
             攤位 {o.booth || "未填"}
           </span>
         )}
-        <div style={{ display: "flex", alignItems: "center", gap: 4, color: palette[0], fontWeight: 700, fontSize: 12 }}>
-          <Clock size={12} /> {elapsedMin}分
+        <div style={{ display: "flex", alignItems: "center", gap: 4, color: palette[0], fontWeight: 700, fontSize: 15 }}>
+          <Clock size={15} /> {elapsedMin}分
         </div>
       </div>
       <div style={{ padding: "12px 14px" }}>
         {o.items.map((i) => (
-          <div key={i.id} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: `1px solid ${C.line}`, fontSize: 15 }}>
+          <div key={i.id} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: `1px solid ${C.line}`, fontSize: 20 }}>
             <span style={{ fontWeight: 600 }}>{i.name}</span>
             <span style={{ fontFamily: "IBM Plex Mono", fontWeight: 700, color: C.amber }}>× {i.qty}</span>
           </div>
         ))}
         <button onClick={onAction} style={{
-          width: "100%", marginTop: 12, padding: "11px 0", borderRadius: 9, border: "none",
-          background: actionColor, color: muted ? C.cream : "#0F1410", fontFamily: "Sora", fontWeight: 700, fontSize: 13, cursor: "pointer",
-          display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+          width: "100%", marginTop: 12, padding: "16px 0", borderRadius: 11, border: "none",
+          background: actionColor, color: muted ? C.cream : "#0F1410", fontFamily: "Sora", fontWeight: 700, fontSize: 17, cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
         }}>
-          <ActionIcon size={14} /> {actionLabel}
+          <ActionIcon size={17} /> {actionLabel}
         </button>
       </div>
     </div>
