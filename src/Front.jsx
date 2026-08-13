@@ -3,6 +3,7 @@ import * as XLSX from "xlsx";
 import {
   Store, Trash2, Delete, Check, Pencil, WifiOff,
   BarChart3, Download, PlusCircle, ShoppingCart, X, Bell, Footprints, ClipboardCheck,
+  Minus, Plus, ChevronRight,
 } from "lucide-react";
 import { dbGet, dbSet, dbListen } from "./store.js";
 
@@ -97,6 +98,14 @@ export default function FrontOfHousePOS() {
   });
   const [stationMenuOpen, setStationMenuOpen] = useState(false);
   const chooseStation = (s) => { localStorage.setItem(STATION_KEY, s); setStation(s); setStationMenuOpen(false); };
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 820);
+  const [mobileCat, setMobileCat] = useState(CATS[0]);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 820);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
   const flags = useRef({ products: false, orders: false, config: false, cart: false });
 
   useEffect(() => {
@@ -343,7 +352,20 @@ export default function FrontOfHousePOS() {
         </div>
       )}
 
-      {view === "order" && (
+      {view === "order" && isMobile && (
+        <MobileOrder
+          products={products} editMode={editMode} mobileCat={mobileCat} setMobileCat={setMobileCat}
+          addToCart={addToCart} updateProduct={updateProduct} addProduct={addProduct} removeProduct={removeProduct}
+          cart={cart} changeQty={changeQty} removeItem={removeItem} comboPairs={comboPairs}
+          subtotal={subtotal} discount={discount} total={total}
+          checkoutOpen={checkoutOpen} setCheckoutOpen={setCheckoutOpen}
+          cash={cash} setCash={setCash} noChange={noChange} setNoChange={setNoChange}
+          cashNum={cashNum} change={change} isVendor={isVendor} setIsVendor={setIsVendor}
+          booth={booth} setBooth={setBooth} checkout={checkout}
+        />
+      )}
+
+      {view === "order" && !isMobile && (
         <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
 
           {/* TOP — all categories side by side, no tabs, no scroll: rows stretch to fill height */}
@@ -550,6 +572,153 @@ function StatCard({ label, value }) {
     <div style={{ background: C.surface, border: `1px solid ${C.line}`, borderRadius: 12, padding: "14px 12px", textAlign: "center" }}>
       <div style={{ fontSize: 11, color: C.faint, marginBottom: 4 }}>{label}</div>
       <div style={{ fontFamily: "IBM Plex Mono", fontWeight: 700, fontSize: 17, color: C.gold }}>{value}</div>
+    </div>
+  );
+}
+
+/* =========================================================
+   MOBILE ORDER — for narrow phone screens (e.g. iPhone roaming station)
+   category tabs + scroll list on top, sticky cart bar, full-screen checkout sheet
+========================================================= */
+function MobileOrder({
+  products, editMode, mobileCat, setMobileCat,
+  addToCart, updateProduct, addProduct, removeProduct,
+  cart, changeQty, removeItem, comboPairs,
+  subtotal, discount, total,
+  checkoutOpen, setCheckoutOpen,
+  cash, setCash, noChange, setNoChange, cashNum, change,
+  isVendor, setIsVendor, booth, setBooth, checkout,
+}) {
+  const cartCount = cart.reduce((s, i) => s + i.qty, 0);
+  const qtyInCart = (id) => cart.find((i) => i.id === id)?.qty || 0;
+
+  return (
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+      {/* category tabs */}
+      <div style={{ flexShrink: 0, display: "flex", gap: 6, padding: "10px 12px", borderBottom: `1px solid ${C.line}` }}>
+        {CATS.map((c) => (
+          <button key={c} onClick={() => setMobileCat(c)} style={{
+            flex: 1, padding: "10px 0", borderRadius: 10, border: "none", cursor: "pointer",
+            background: mobileCat === c ? CAT_COLOR[c] : C.bg, color: mobileCat === c ? "#fff" : C.muted,
+            fontFamily: "Sora", fontWeight: 700, fontSize: 14,
+          }}>{c}</button>
+        ))}
+      </div>
+
+      {/* item list */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "4px 12px" }}>
+        {editMode && (
+          <button onClick={() => addProduct(mobileCat)} style={{
+            width: "100%", margin: "8px 0", padding: "10px 0", borderRadius: 10, border: `1px dashed ${C.line}`,
+            background: "transparent", color: C.muted, fontSize: 13, fontWeight: 600, cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+          }}><PlusCircle size={15} /> 新增品項</button>
+        )}
+        {products[mobileCat].map((p) => {
+          const soldOut = p.stock != null && p.stock <= 0;
+          const qty = qtyInCart(p.id);
+          if (editMode) {
+            return (
+              <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 4px", borderBottom: `1px solid ${C.line}` }}>
+                <input value={p.name} onChange={(e) => updateProduct(mobileCat, p.id, "name", e.target.value)} style={{ ...smallInputStyle, flex: 1, fontWeight: 600 }} />
+                <span style={{ color: C.faint, fontSize: 12 }}>$</span>
+                <input type="number" value={p.price} onChange={(e) => updateProduct(mobileCat, p.id, "price", e.target.value)} style={{ ...smallInputStyle, width: 56, fontFamily: "IBM Plex Mono" }} />
+                <span style={{ color: C.faint, fontSize: 11 }}>庫存</span>
+                <input type="number" value={p.stock ?? ""} placeholder="不限" onChange={(e) => updateProduct(mobileCat, p.id, "stock", e.target.value)} style={{ ...smallInputStyle, width: 52, fontFamily: "IBM Plex Mono" }} />
+                <button onClick={() => removeProduct(mobileCat, p.id)} style={{ ...iconBtnStyle, color: C.danger, flexShrink: 0 }}><Trash2 size={13} /></button>
+              </div>
+            );
+          }
+          return (
+            <div key={p.id} onClick={() => !soldOut && addToCart(p, mobileCat)} style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 6px",
+              borderBottom: `1px solid ${C.line}`, opacity: soldOut ? 0.5 : 1, cursor: soldOut ? "not-allowed" : "pointer",
+            }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <span style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 17 }}>{p.name}</span>
+                <span style={{ fontFamily: "IBM Plex Mono", fontSize: 14, color: C.gold, fontWeight: 600 }}>{money(p.price)}</span>
+                {p.stock != null && <span style={{ fontSize: 11, color: soldOut ? C.danger : C.faint, fontWeight: 600 }}>{soldOut ? "已售完" : `剩 ${p.stock}`}</span>}
+              </div>
+              {qty > 0 && !soldOut && (
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }} onClick={(e) => e.stopPropagation()}>
+                  <button onClick={() => changeQty(p.id, -1)} style={iconBtnStyle}><Minus size={14} /></button>
+                  <span style={{ width: 20, textAlign: "center", fontFamily: "IBM Plex Mono", fontWeight: 700 }}>{qty}</span>
+                  <button onClick={() => addToCart(p, mobileCat)} style={iconBtnStyle}><Plus size={14} /></button>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* sticky cart bar */}
+      <button onClick={() => cartCount > 0 && setCheckoutOpen(true)} disabled={cartCount === 0} style={{
+        flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "16px 20px", border: "none", borderTop: `1px solid ${C.line}`,
+        background: cartCount > 0 ? C.ink : C.bg, color: cartCount > 0 ? "#fff" : C.faint, cursor: cartCount > 0 ? "pointer" : "default",
+      }}>
+        <span style={{ display: "flex", alignItems: "center", gap: 8, fontFamily: "Sora", fontWeight: 700, fontSize: 16 }}>
+          <ShoppingCart size={17} /> {cartCount > 0 ? `${cartCount} 項 · ${money(total)}` : "尚未選擇商品"}
+        </span>
+        {cartCount > 0 && <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 14, fontWeight: 700 }}>去結帳 <ChevronRight size={16} /></span>}
+      </button>
+
+      {checkoutOpen && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 90, background: C.bg, display: "flex", flexDirection: "column" }}>
+          <div style={{ flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: `1px solid ${C.line}`, background: C.surface }}>
+            <span style={{ fontFamily: "Sora", fontWeight: 700, fontSize: 17 }}>結帳</span>
+            <button onClick={() => setCheckoutOpen(false)} style={iconBtnStyle}><X size={16} /></button>
+          </div>
+
+          <div style={{ flex: 1, overflowY: "auto", padding: "12px 18px" }}>
+            {cart.map((i) => (
+              <div key={i.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 0", borderBottom: `1px solid ${C.line}` }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 15, fontWeight: 600 }}>{i.name}</div>
+                  <div style={{ fontSize: 12, color: C.faint, fontFamily: "IBM Plex Mono" }}>{money(i.price)} × {i.qty}</div>
+                </div>
+                <button onClick={() => changeQty(i.id, -1)} style={iconBtnStyle}><Minus size={14} /></button>
+                <span style={{ width: 20, textAlign: "center", fontFamily: "IBM Plex Mono" }}>{i.qty}</span>
+                <button onClick={() => changeQty(i.id, 1)} style={iconBtnStyle}><Plus size={14} /></button>
+                <button onClick={() => removeItem(i.id)} style={{ ...iconBtnStyle, color: C.danger }}><Trash2 size={14} /></button>
+              </div>
+            ))}
+
+            {comboPairs > 0 && <div style={{ fontSize: 12, color: C.green, fontWeight: 600, marginTop: 8 }}>已套用 {comboPairs} 組套組折扣</div>}
+
+            <label style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 12, cursor: "pointer" }}>
+              <input type="checkbox" checked={isVendor} onChange={(e) => setIsVendor(e.target.checked)} style={{ width: 15, height: 15 }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: isVendor ? C.gold : C.muted }}>廠商攤位訂單</span>
+            </label>
+            {isVendor && <input value={booth} onChange={(e) => setBooth(e.target.value)} placeholder="攤位編號 / 名稱" style={{ ...smallInputStyle, marginTop: 6, width: "100%", fontSize: 13 }} />}
+
+            <div style={{ borderTop: `1px solid ${C.line}`, marginTop: 12, paddingTop: 8 }}>
+              <Row label="小計" value={money(subtotal)} muted />
+              {discount > 0 && <Row label="套組折扣" value={`− ${money(discount)}`} color={C.green} />}
+              <Row label="應收金額" value={money(total)} big />
+            </div>
+
+            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+              <input value={noChange ? String(total) : cash} onChange={(e) => setCash(e.target.value.replace(/[^0-9]/g, ""))} placeholder="客收現金" style={{ ...smallInputStyle, flex: 1, padding: "12px 14px", fontSize: 18, fontFamily: "IBM Plex Mono" }} />
+              <button onClick={() => setNoChange((v) => !v)} style={{ padding: "0 14px", borderRadius: 10, border: `1px solid ${noChange ? C.green : C.line}`, background: noChange ? C.greenSoft : "transparent", color: noChange ? C.green : C.muted, fontWeight: 700, fontSize: 13, cursor: "pointer" }}>不找零</button>
+            </div>
+            <Row label="找零" value={cash === "" && !noChange ? "—" : money(change)} color={C.gold} style={{ marginTop: 6 }} />
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginTop: 10 }}>
+              <Numpad onDigit={(d) => setCash((c) => (noChange ? "" : c) + d)} onClear={() => setCash("")} onBackspace={() => setCash((c) => c.slice(0, -1))} disabled={noChange} />
+            </div>
+          </div>
+
+          <div style={{ flexShrink: 0, padding: "12px 18px", borderTop: `1px solid ${C.line}`, background: C.surface }}>
+            <button disabled={cart.length === 0 || (!noChange && cashNum < total)} onClick={() => { checkout(); setCheckoutOpen(false); }} style={{
+              width: "100%", padding: "16px 0", borderRadius: 14, border: "none",
+              background: (cart.length && (noChange || cashNum >= total)) ? C.ink : C.line,
+              color: (cart.length && (noChange || cashNum >= total)) ? "#fff" : C.faint,
+              fontFamily: "Sora", fontWeight: 700, fontSize: 17, cursor: "pointer",
+            }}>確認結帳並送單到後廚</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
